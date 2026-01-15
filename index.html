@@ -726,17 +726,19 @@
                 const data = await response.json();
                 
                 if (data.success) {
+                    state.loading = false;
                     showSuccess();
                 } else {
+                    state.loading = false;
                     alert('Failed to submit order. Please try again.');
+                    render();
                 }
             } catch (err) {
                 console.error('Error submitting order:', err);
+                state.loading = false;
                 alert('Error submitting order. Please check your connection and try again.');
-            }
-            
-            state.loading = false;
-            render();
+                render();
+            } 
         }
 
         async function loadOwnerOrders() {
