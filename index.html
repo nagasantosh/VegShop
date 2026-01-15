@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Veggies - Online Order System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #059669;
+        }
+        
+        .btn-secondary {
+            background: #047857;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #065f46;
+        }
+        
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .error-banner {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            color: #92400e;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .error-banner button {
+            background: none;
+            border: none;
+            color: #92400e;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .main-content {
+            padding: 2rem 0;
+        }
+        
+        .cart-summary {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cart-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .cart-total {
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        .btn-checkout {
+            background: #059669;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-checkout:hover {
+            background: #047857;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+        }
+        
+        .product-image {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+        }
+        
+        .product-info {
+            padding: 1rem;
+        }
+        
+        .product-name {
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .product-price {
+            color: #059669;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .quantity-controls {
+            background: #f0fdf4;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .qty-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: none;
+            background: #059669;
+            color: white;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        
+        .qty-btn:hover {
+            background: #047857;
+        }
+        
+        .btn-add {
+            width: 100%;
+            background: #059669;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-add:hover {
+            background: #047857;
+        }
+        
+        .checkout-container {
+            max-width: 768px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .btn-back {
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-back:hover {
+            color: #374151;
+        }
+        
+        .order-summary {
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            font-size: 1.125rem;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        
+        .delivery-mode {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.active {
+            border-color: #059669;
+            background: #f0fdf4;
+            color: #059669;
+        }
+        
+        .mode-btn:hover {
+            border-color: #a7f3d0;
+        }
+        
+        .delivery-section {
+            background: #f0fdf4;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .item-delivery {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .item-delivery-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .delivery-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background: #059669;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .btn-submit:hover {
+            background: #047857;
+        }
+        
+        .success-card {
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .success-icon {
+            width: 5rem;
+            height: 5rem;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        
+        .success-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #059669;
+            margin-bottom: 0.5rem;
+        }
+        
+        .success-message {
+            color: #6b7280;
+        }
+        
+        .owner-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .date-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .date-input-group {
+            flex: 1;
+        }
+        
+        .summary-header {
+            background: #f0fdf4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .item-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .item-header {
+            background: #f9fafb;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .item-header:hover {
+            background: #f3f4f6;
+        }
+        
+        .item-info-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .item-badge {
+            width: 3rem;
+            height: 3rem;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #059669;
+        }
+        
+        .item-details {
+            padding: 1rem;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .flat-number {
+            font-weight: 500;
+        }
+        
+        .time-slot {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .order-quantity {
+            font-weight: 600;
+            color: #059669;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem 0;
+        }
+        
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid #e5e7eb;
+            border-top-color: #059669;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: #6b7280;
+        }
+        
+        @media (max-width: 640px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .delivery-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .date-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- IMPORTANT: Replace with your Google Apps Script URL -->
+    <script>
+        const SCRIPT_URL = 'YOUR_SCRIPT_URL_HERE';
+        const USE_GOOGLE_SHEETS = SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbyUtKmgKTNzo40NdTKIAlFFgyZ0c3n12RRABX6JcBdCkauAVOp-FUxUy81qpkRr-Ah8/exec';
+    </script>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    <h1>Fresh Veggies</h1>
+                </div>
+                <div class="nav-buttons">
+                    <button id="btnShop" class="btn btn-primary">Shop</button>
+                    <button id="btnOwner" class="btn btn-secondary">Owner</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Error Banner -->
+    <div class="container">
+        <div id="errorContainer" class="error-banner hidden">
+            <span id="errorMessage"></span>
+            <button onclick="hideError()">×</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        <div id="mainContent"></div>
+    </div>
+
+    <script>
+        // State management
+        let state = {
+            view: 'shop',
+            cart: [],
+            vegetables: [],
+            showCheckout: false,
+            flatNumber: '',
+            mobileNumber: '',
+            deliveryMode: 'single',
+            singleDate: '',
+            singleTime: '',
+            ownerDate: '',
+            ownerOrders: [],
+            expandedItems: {},
+            loading: false
+        };
+
+        const timeSlots = ['8:00 AM - 10:00 AM', '10:00 AM - 12:00 PM', '4:00 PM - 6:00 PM', '6:00 PM - 8:00 PM'];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (USE_GOOGLE_SHEETS) {
+                loadProducts();
+            } else {
+                showError('Google Sheets not configured. Using demo data. Update SCRIPT_URL in the code.');
+                useFallbackProducts();
+                render();
+            }
+            
+            const savedMobile = localStorage.getItem('customerMobile');
+            if (savedMobile) {
+                state.mobileNumber = savedMobile;
+            }
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('btnShop').addEventListener('click', () => {
+                state.view = 'shop';
+                state.showCheckout = false;
+                render();
+            });
+            document.getElementById('btnOwner').addEventListener('click', () => {
+                state.view = 'owner';
+                render();
+            });
+        }
+
+        // API Functions
+        async function loadProducts() {
+            state.loading = true;
+            render();
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getProducts`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    state.vegetables = data.products;
+                } else {
+                    showError('Failed to load products from Google Sheets. Using demo data.');
+                    useFallbackProducts();
+                }
+            } catch (err) {
+                console.error('Error loading products:', err);
+                showError('Cannot connect to Google Sheets. Using demo data. Please check your SCRIPT_URL.');
+                useFallbackProducts();
+            }
+            
+            state.loading = false;
+            render();
+        }
+
+        function useFallbackProducts() {
+            state.vegetables = [
+                { id: 1, name: 'Tomatoes', price: 40, unit: 'kg', image: '🍅' },
+                { id: 2, name: 'Potatoes', price: 30, unit: 'kg', image: '🥔' },
+                { id: 3, name: 'Onions', price: 35, unit: 'kg', image: '🧅' },
+                { id: 4, name: 'Carrots', price: 45, unit: 'kg', image: '🥕' },
+                { id: 5, name: 'Capsicum', price: 60, unit: 'kg', image: '🫑' },
+                { id: 6, name: 'Cabbage', price: 25, unit: 'piece', image: '🥬' },
+                { id: 7, name: 'Cauliflower', price: 40, unit: 'piece', image: '🥦' },
+                { id: 8, name: 'Spinach', price: 30, unit: 'bunch', image: '🥬' },
+                { id: 9, name: 'Brinjal', price: 35, unit: 'kg', image: '🍆' },
+                { id: 10, name: 'Ladies Finger', price: 50, unit: 'kg', image: '🌿' }
+            ];
+        }
+
+        async function submitOrder() {
+            if (!state.flatNumber || !state.mobileNumber) {
+                alert('Please enter flat number and mobile number');
+                return;
+            }
+
+            if (state.deliveryMode === 'single' && (!state.singleDate || !state.singleTime)) {
+                alert('Please select delivery date and time');
+                return;
+            }
+
+            if (state.deliveryMode === 'individual') {
+                const incomplete = state.cart.some(item => !item.deliveryDate || !item.deliveryTime);
+                if (incomplete) {
+                    alert('Please select delivery date and time for all items');
+                    return;
+                }
+            }
+
+            localStorage.setItem('customerMobile', state.mobileNumber);
+
+            const orders = state.cart.map(item => ({
+                item: item.name,
+                quantity: item.quantity,
+                unit: item.unit,
+                price: item.price,
+                total: item.price * item.quantity,
+                flatNumber: state.flatNumber,
+                mobileNumber: state.mobileNumber,
+                deliveryDate: state.deliveryMode === 'single' ? state.singleDate : item.deliveryDate,
+                deliveryTime: state.deliveryMode === 'single' ? state.singleTime : item.deliveryTime,
+                timestamp: new Date().toISOString()
+            }));
+
+            if (!USE_GOOGLE_SHEETS) {
+                console.log('Demo mode: Order would be submitted:', orders);
+                showSuccess();
+                return;
+            }
+
+            state.loading = true;
+            render();
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=submitOrder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ orders })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess();
+                } else {
+                    alert('Failed to submit order. Please try again.');
+                }
+            } catch (err) {
+                console.error('Error submitting order:', err);
+                alert('Error submitting order. Please check your connection and try again.');
+            }
+            
+            state.loading = false;
+            render();
+        }
+
+        async function loadOwnerOrders() {
+            if (!state.ownerDate) {
+                alert('Please select a date');
+                return;
+            }
+
+            if (!USE_GOOGLE_SHEETS) {
+                showError('Demo mode: Cannot load orders without Google Sheets.');
+                state.ownerOrders = [];
+                render();
+                return;
+            }
+
+            state.loading = true;
+            render();
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getOrders&date=${state.ownerDate}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    state.ownerOrders = data.orders;
+                } else {
+                    showError('Failed to load orders');
+                    state.ownerOrders = [];
+                }
+            } catch (err) {
+                console.error('Error loading orders:', err);
+                showError('Error loading orders. Please check your connection.');
+                state.ownerOrders = [];
+            }
+            
+            state.loading = false;
+            render();
+        }
+
+        // Cart Functions
+        function addToCart(vegId) {
+            const veg = state.vegetables.find(v => v.id == vegId);
+            const existing = state.cart.find(item => item.id == vegId);
+            
+            if (existing) {
+                existing.quantity++;
+            } else {
+                state.cart.push({ ...veg, quantity: 1, deliveryDate: '', deliveryTime: '' });
+            }
+            render();
+        }
+
+        function updateQuantity(vegId, quantity) {
+            if (quantity <= 0) {
+                state.cart = state.cart.filter(item => item.id != vegId);
+            } else {
+                const item = state.cart.find(i => i.id == vegId);
+                if (item) item.quantity = quantity;
+            }
+            render();
+        }
+
+        function updateItemDelivery(vegId, field, value) {
+            const item = state.cart.find(i => i.id == vegId);
+            if (item) item[field] = value;
+        }
+
+        function toggleItemExpand(itemName) {
+            state.expandedItems[itemName] = !state.expandedItems[itemName];
+            render();
+        }
+
+        function getTotalAmount() {
+            return state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        // UI Functions
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorContainer').classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorContainer').classList.add('hidden');
+        }
+
+        function showSuccess() {
+            const content = document.getElementById('mainContent');
+            content.innerHTML = `
+                <div class="checkout-container">
+                    <div class="card success-card">
+                        <div class="success-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h2 class="success-title">Order Submitted!</h2>
+                        <p class="success-message">Thank you for your order. We'll deliver fresh vegetables to your doorstep.</p>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                state.cart = [];
+                state.showCheckout = false;
+                state.flatNumber = '';
+                state.singleDate = '';
+                state.singleTime = '';
+                state.deliveryMode = 'single';
+                render();
+            }, 3000);
+        }
+
+        // Render Functions
+        function render() {
+            updateHeaderButtons();
+            
+            if (state.view === 'shop') {
+                renderShop();
+            } else {
+                renderOwner();
+            }
+        }
+
+        function updateHeaderButtons() {
+            const btnShop = document.getElementById('btnShop');
+            const btnOwner = document.getElementById('btnOwner');
+            
+            if (state.view === 'shop') {
+                btnShop.className = 'btn btn-primary';
+                btnOwner.className = 'btn btn-secondary';
+            } else {
+                btnShop.className = 'btn btn-secondary';
+                btnOwner.className = 'btn btn-primary';
+            }
+        }
+
+        function renderShop() {
+            const content = document.getElementById('mainContent');
+            
+            if (state.showCheckout) {
+                renderCheckout();
+                return;
+            }
+
+            let html = '';
+
+            // Cart Summary
+            if (state.cart.length > 0) {
+                const total = getTotalAmount();
+                html += `
+                    <div class="cart-summary">
+                        <div class="cart-info">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <span><strong>${state.cart.length}</strong> items in cart</span>
+                            <span class="cart-total">₹${total}</span>
+                        </div>
+                        <button onclick="state.showCheckout = true; render();" class="btn-checkout">Checkout</button>
+                    </div>
+                `;
+            }
+
+            // Loading State
+            if (state.loading && state.vegetables.length === 0) {
+                html += `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading products...</p>
+                    </div>
+                `;
+            }
+
+            // Products Grid
+            html += '<div class="products-grid">';
+            
+            state.vegetables.forEach(veg => {
+                const cartItem = state.cart.find(item => item.id == veg.id);
+                html += `
+                    <div class="product-card">
+                        <div class="product-image">${veg.image}</div>
+                        <div class="product-info">
+                            <div class="product-name">${veg.name}</div>
+                            <div class="product-price">₹${veg.price}/${veg.unit}</div>
+                            ${cartItem ? `
+                                <div class="quantity-controls">
+                                    <button onclick="updateQuantity(${veg.id}, ${cartItem.quantity - 1})" class="qty-btn">−</button>
+                                    <span><strong>${cartItem.quantity}</strong></span>
+                                    <button onclick="updateQuantity(${veg.id}, ${cartItem.quantity + 1})" class="qty-btn">+</button>
+                                </div>
+                            ` : `
+                                <button onclick="addToCart(${veg.id})" class="btn-add">Add to Cart</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        function renderCheckout() {
+            const content = document.getElementById('mainContent');
+            const total = getTotalAmount();
+            const minDate = new Date().toISOString().split('T')[0];
+            
+            let html = `
+                <div class="checkout-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Checkout</h2>
+                            <button onclick="state.showCheckout = false; render();" class="btn-back">← Back</button>
+                        </div>
+
+                        <div class="order-summary">
+                            <h3 class="summary-title">Order Summary</h3>
+            `;
+            
+            state.cart.forEach(item => {
+                html += `
+                    <div class="summary-item">
+                        <span>${item.name} × ${item.quantity}</span>
+                        <span><strong>₹${item.price * item.quantity}</strong></span>
+                    </div>
+                `;
+            });
+            
+            html += `
+                            <div class="summary-total">
+                                <span>Total</span>
+                                <span class="cart-total">₹${total}</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Flat Number</label>
+                            <input type="text" id="flatNumber" value="${state.flatNumber}" 
+                                oninput="state.flatNumber = this.value"
+                                placeholder="e.g., A-101" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Mobile Number</label>
+                            <input type="tel" id="mobileNumber" value="${state.mobileNumber}"
+                                oninput="state.mobileNumber = this.value"
+                                placeholder="10-digit mobile number" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Delivery Preference</label>
+                            <div class="delivery-mode">
+                                <button onclick="state.deliveryMode = 'single'; render();" 
+                                    class="mode-btn ${state.deliveryMode === 'single' ? 'active' : ''}">
+                                    Same for all
+                                </button>
+                                <button onclick="state.deliveryMode = 'individual'; render();" 
+                                    class="mode-btn ${state.deliveryMode === 'individual' ? 'active' : ''}">
+                                    Individual
+                                </button>
+                            </div>
+                        </div>
+            `;
+
+            if (state.deliveryMode === 'single') {
+                html += `
+                    <div class="delivery-section">
+                        <div class="form-group">
+                            <label class="form-label">Delivery Date</label>
+                            <input type="date" id="singleDate" value="${state.singleDate}" 
+                                oninput="state.singleDate = this.value"
+                                min="${minDate}" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Time Slot</label>
+                            <select id="singleTime" onchange="state.singleTime = this.value" class="form-input">
+                                <option value="">Select time slot</option>
+                                ${timeSlots.map(slot => `<option value="${slot}" ${state.singleTime === slot ? 'selected' : ''}>${slot}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (state.deliveryMode === 'individual') {
+                html += '<div style="margin-bottom: 1.5rem;">';
+                state.cart.forEach(item => {
+                    html += `
+                        <div class="item-delivery">
+                            <div class="item-delivery-title">${item.name} (${item.quantity} ${item.unit})</div>
+                            <div class="delivery-inputs">
+                                <div>
+                                    <label class="form-label">Date</label>
+                                    <input type="date" value="${item.deliveryDate || ''}" 
+                                        oninput="updateItemDelivery(${item.id}, 'deliveryDate', this.value)"
+                                        min="${minDate}" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="form-label">Time</label>
+                                    <select onchange="updateItemDelivery(${item.id}, 'deliveryTime', this.value)" class="form-input">
+                                        <option value="">Select slot</option>
+                                        ${timeSlots.map(slot => `<option value="${slot}" ${item.deliveryTime === slot ? 'selected' : ''}>${slot}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            html += `
+                        <button onclick="submitOrder()" ${state.loading ? 'disabled' : ''} class="btn-submit">
+                            ${state.loading ? 'Submitting...' : 'Submit Order'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        function renderOwner() {
+            const content = document.getElementById('mainContent');
+            
+            let html = `
+                <div class="owner-container">
+                    <div class="card">
+                        <h2 class="card-title" style="margin-bottom: 1.5rem;">Daily Order Summary</h2>
+                        
+                        <div class="date-selector">
+                            <div class="date-input-group">
+                                <label class="form-label">Select Date</label>
+                                <input type="date" id="ownerDate" value="${state.ownerDate}"
+                                    oninput="state.ownerDate = this.value" class="form-input">
+                            </div>
+                            <div style="display: flex; align-items: flex-end;">
+                                <button onclick="loadOwnerOrders()" ${state.loading ? 'disabled' : ''} class="btn btn-primary" style="padding: 0.5rem 1.5rem;">
+                                    ${state.loading ? 'Loading...' : 'Load Orders'}
+                                </button>
+                            </div>
+                        </div>
+            `;
+
+            if (state.ownerOrders.length > 0) {
+                html += `
+                    <div class="summary-header">
+                        <h3 style="font-weight: 600; font-size: 1.125rem; margin-bottom: 0.5rem;">Summary for ${state.ownerDate}</h3>
+                        <p style="font-size: 0.875rem; color: #6b7280;">Total items: ${state.ownerOrders.length}</p>
+                    </div>
+                `;
+
+                state.ownerOrders.forEach((item, idx) => {
+                    const isExpanded = state.expandedItems[item.item];
+                    html += `
+                        <div class="item-card">
+                            <div class="item-header" onclick="toggleItemExpand('${item.item}')">
+                                <div class="item-info-group">
+                                    <div class="item-badge">${item.totalQuantity}</div>
+                                    <div>
+                                        <div style="font-weight: 600;">${item.item}</div>
+                                        <div style="font-size: 0.875rem; color: #6b7280;">${item.totalQuantity} ${item.unit} total</div>
+                                    </div>
+                                </div>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"></path>
+                                </svg>
+                            </div>
+                            ${isExpanded ? `
+                                <div class="item-details">
+                                    ${item.orders.map(order => `
+                                        <div class="order-item">
+                                            <span class="flat-number">${order.flatNumber}</span>
+                                            <span class="time-slot">${order.time}</span>
+                                            <span class="order-quantity">${order.quantity} ${item.unit}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+            } else if (state.ownerDate && !state.loading) {
+                html += '<div class="empty-state">No orders found for this date</div>';
+            }
+
+            html += '</div></div>';
+            content.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
