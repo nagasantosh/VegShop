@@ -758,6 +758,7 @@
             render();
 
             try {
+                alert(state.ownerDate);
                 const response = await fetch(`${SCRIPT_URL}?action=getOrders&date=${state.ownerDate}`);
                 const data = await response.json();
                 
