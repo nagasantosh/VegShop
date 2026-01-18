@@ -5,101 +5,583 @@
   <title>Delivery Schedule</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 16px;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    h1, h2, h3 {
-      margin-top: 24px;
-    }
-
-    input[type="date"] {
-      padding: 8px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 250px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
-
-    th {
-      background: #f4f4f4;
-    }
-
-    .message {
-      margin-top: 16px;
-      font-weight: bold;
-      color: #c00;
-    }
-
-    .mobile-block {
-      margin-top: 24px;
-      border: 1px solid #ddd;
-      padding: 12px;
-      border-radius: 6px;
-    }
-
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-
-      thead {
-        display: none;
-      }
-
-      tr {
-        margin-bottom: 10px;
-      }
-
-      td {
-        border: none;
-        padding: 6px 0;
-      }
-
-      td::before {
-        font-weight: bold;
-        display: block;
-      }
-    }
-  </style>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #059669;
+        }
+        
+        .btn-secondary {
+            background: #047857;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #065f46;
+        }
+        
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .error-banner {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            color: #92400e;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .error-banner button {
+            background: none;
+            border: none;
+            color: #92400e;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .main-content {
+            padding: 2rem 0;
+        }
+        
+        .cart-summary {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cart-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .cart-total {
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        .btn-checkout {
+            background: #059669;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-checkout:hover {
+            background: #047857;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+        }
+        
+        .product-image {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+        }
+        
+        .product-info {
+            padding: 1rem;
+        }
+        
+        .product-name {
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .product-price {
+            color: #059669;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .quantity-controls {
+            background: #f0fdf4;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .qty-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: none;
+            background: #059669;
+            color: white;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        
+        .qty-btn:hover {
+            background: #047857;
+        }
+        
+        .btn-add {
+            width: 100%;
+            background: #059669;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-add:hover {
+            background: #047857;
+        }
+        
+        .checkout-container {
+            max-width: 768px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .btn-back {
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-back:hover {
+            color: #374151;
+        }
+        
+        .order-summary {
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            font-size: 1.125rem;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        
+        .delivery-mode {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.active {
+            border-color: #059669;
+            background: #f0fdf4;
+            color: #059669;
+        }
+        
+        .mode-btn:hover {
+            border-color: #a7f3d0;
+        }
+        
+        .delivery-section {
+            background: #f0fdf4;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .item-delivery {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .item-delivery-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .delivery-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background: #059669;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .btn-submit:hover {
+            background: #047857;
+        }
+        
+        .success-card {
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .success-icon {
+            width: 5rem;
+            height: 5rem;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        
+        .success-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #059669;
+            margin-bottom: 0.5rem;
+        }
+        
+        .success-message {
+            color: #6b7280;
+        }
+        
+        .owner-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .date-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .date-input-group {
+            flex: 1;
+        }
+        
+        .summary-header {
+            background: #f0fdf4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .item-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .item-header {
+            background: #f9fafb;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .item-header:hover {
+            background: #f3f4f6;
+        }
+        
+        .item-info-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .item-badge {
+            width: 3rem;
+            height: 3rem;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #059669;
+        }
+        
+        .item-details {
+            padding: 1rem;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .flat-number {
+            font-weight: 500;
+        }
+        
+        .time-slot {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .order-quantity {
+            font-weight: 600;
+            color: #059669;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem 0;
+        }
+        
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid #e5e7eb;
+            border-top-color: #059669;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: #6b7280;
+        }
+        
+        @media (max-width: 640px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .delivery-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .date-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Delivery Schedule</h1>
+<header>
+  <div class="container header-content">
+    <div class="logo">
+      <h1>Delivery Schedule</h1>
+    </div>
+  </div>
+</header>
 
-<label>
-  Select Delivery Date:
-  <input type="date" id="datePicker" />
-</label>
+<main class="main-content">
+  <div class="container owner-container">
 
-<div id="noOrders" class="message" style="display:none;">
-  No orders for the selected date.
-</div>
+    <!-- DATE SELECTOR -->
+    <div class="date-selector">
+      <div class="date-input-group">
+        <label class="form-label">Select Delivery Date</label>
+        <input type="date" id="datePicker" class="form-input" />
+      </div>
+    </div>
 
-<h2>Total Quantity per Item</h2>
-<table>
-  <thead>
-    <tr><th>Item</th><th>Total Quantity</th><th>Unit</th></tr>
-  </thead>
-  <tbody id="itemSummary"></tbody>
-</table>
+    <!-- EMPTY STATE -->
+    <div id="emptyState" class="empty-state hidden">
+      No orders for the selected date.
+    </div>
 
-<h2>Orders Grouped by Mobile Number</h2>
-<div id="mobileGroups"></div>
+    <!-- ITEM TOTAL SUMMARY -->
+    <div id="itemTotals"></div>
+
+    <!-- MOBILE GROUPS -->
+    <div id="mobileGroups"></div>
+
+  </div>
+</main>
 
 <script>
 const CSV_URL =
@@ -138,16 +620,17 @@ function normalizeDate(dateStr) {
 function renderForDate(date) {
   const rows = data.filter(r => normalizeDate(r.deliveryDate) === date);
 
+  document.getElementById("itemTotals").innerHTML = "";
+  document.getElementById("mobileGroups").innerHTML = "";
+
   if (rows.length === 0) {
-    document.getElementById("noOrders").style.display = "block";
-    document.getElementById("itemSummary").innerHTML = "";
-    document.getElementById("mobileGroups").innerHTML = "";
+    document.getElementById("emptyState").classList.remove("hidden");
     return;
   }
 
-  document.getElementById("noOrders").style.display = "none";
+  document.getElementById("emptyState").classList.add("hidden");
   renderItemTotals(rows);
-  renderGroupedByMobile(rows);
+  renderByMobile(rows);
 }
 
 function renderItemTotals(rows) {
@@ -157,57 +640,58 @@ function renderItemTotals(rows) {
     map[r.item].qty += Number(r.quantity || 0);
   });
 
-  const tbody = document.getElementById("itemSummary");
-  tbody.innerHTML = "";
+  const container = document.getElementById("itemTotals");
+
   Object.entries(map).forEach(([item, info]) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${item}</td>
-        <td>${info.qty}</td>
-        <td>${info.unit}</td>
-      </tr>
+    container.innerHTML += `
+      <div class="item-card">
+        <div class="item-header">
+          <div class="item-info-group">
+            <div class="item-badge">${info.qty}</div>
+            <div>
+              <div class="flat-number">${item}</div>
+              <div class="time-slot">${info.unit}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     `;
   });
 }
 
-function renderGroupedByMobile(rows) {
+function renderByMobile(rows) {
   const mobileMap = {};
 
   rows.forEach(r => {
-    const mobile = r.mobileNumber;
-    if (!mobileMap[mobile]) mobileMap[mobile] = {};
-    if (!mobileMap[mobile][r.item]) {
-      mobileMap[mobile][r.item] = { qty: 0, unit: r.unit };
+    if (!mobileMap[r.mobileNumber]) mobileMap[r.mobileNumber] = {};
+    if (!mobileMap[r.mobileNumber][r.item]) {
+      mobileMap[r.mobileNumber][r.item] = { qty: 0, unit: r.unit };
     }
-    mobileMap[mobile][r.item].qty += Number(r.quantity || 0);
+    mobileMap[r.mobileNumber][r.item].qty += Number(r.quantity || 0);
   });
 
   const container = document.getElementById("mobileGroups");
-  container.innerHTML = "";
 
   Object.entries(mobileMap).forEach(([mobile, items]) => {
-    const div = document.createElement("div");
-    div.className = "mobile-block";
+    let itemsHtml = "";
 
-    div.innerHTML = `
-      <h3>Mobile: ${mobile}</h3>
-      <table>
-        <thead>
-          <tr><th>Item</th><th>Total Quantity</th><th>Unit</th></tr>
-        </thead>
-        <tbody>
-          ${Object.entries(items).map(([item, info]) => `
-            <tr>
-              <td>${item}</td>
-              <td>${info.qty}</td>
-              <td>${info.unit}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
+    Object.entries(items).forEach(([item, info]) => {
+      itemsHtml += `
+        <div class="order-item">
+          <span>${item} (${info.unit})</span>
+          <span class="order-quantity">${info.qty}</span>
+        </div>
+      `;
+    });
+
+    container.innerHTML += `
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-header">
+          <div class="card-title">Mobile: ${mobile}</div>
+        </div>
+        ${itemsHtml}
+      </div>
     `;
-
-    container.appendChild(div);
   });
 }
 </script>
