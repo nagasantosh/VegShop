@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Delivery Schedule</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #f4f4f4; }
+    select { font-size: 16px; padding: 6px; }
+  </style>
+</head>
+<body>
+
+<h1>Delivery Schedule</h1>
+
+<label>
+  Select Delivery Date:
+  <select id="dateSelect"></select>
+</label>
+
+<h2>1. Total Quantity per Item</h2>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Total Qty</th><th>Unit</th></tr>
+  </thead>
+  <tbody id="itemSummary"></tbody>
+</table>
+
+<h2>2. Items by Mobile Number</h2>
+<table>
+  <thead>
+    <tr><th>Mobile No</th><th>Item</th><th>Qty</th><th>Unit</th></tr>
+  </thead>
+  <tbody id="mobileSummary"></tbody>
+</table>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdjwBZPsWhEFvKDlbWK8-XK1lxE3jtpLNtc8kfv9OdkZHxIA-oIMohsQPhjwL-SmidxXC5xGJXsrCJ/pub?gid=135295189&single=true&output=csv";
+
+let data = [];
+
+fetch(CSV_URL)
+  .then(res => res.text())
+  .then(text => {
+    data = csvToObjects(text);
+    populateDates();
+  })
+  .catch(err => {
+    console.error("CSV fetch failed:", err);
+    alert("Failed to load CSV — check the link or CORS settings.");
+  });
+
+function csvToObjects(csv) {
+  const lines = csv.trim().split(/\r?\n/);
+  const headers = lines[0].split(",").map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const values = line.split(",");
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (values[i] || "").trim());
+    return obj;
+  });
+}
+
+function populateDates() {
+  const dateSelect = document.getElementById("dateSelect");
+  const dates = [...new Set(data.map(r => r.deliveryDate).filter(d => d))];
+  
+  dateSelect.innerHTML = "";
+  dates.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    dateSelect.appendChild(opt);
+  });
+
+  dateSelect.onchange = () => render(dateSelect.value);
+
+  if (dates.length > 0) render(dates[0]);
+}
+
+function render(date) {
+  const filtered = data.filter(r => r.deliveryDate === date);
+  renderItemTotals(filtered);
+  renderByMobile(filtered);
+}
+
+function renderItemTotals(rows) {
+  const map = {};
+  rows.forEach(r => {
+    if (!map[r.item]) map[r.item] = { qty: 0, unit: r.unit };
+    map[r.item].qty += Number(r.quantity || 0);
+  });
+
+  const tbody = document.getElementById("itemSummary");
+  tbody.innerHTML = "";
+  Object.entries(map).forEach(([item, info]) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${item}</td>
+        <td>${info.qty}</td>
+        <td>${info.unit}</td>
+      </tr>
+    `;
+  });
+}
+
+function renderByMobile(rows) {
+  const tbody = document.getElementById("mobileSummary");
+  tbody.innerHTML = "";
+  rows.forEach(r => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.mobileNumber}</td>
+        <td>${r.item}</td>
+        <td>${r.quantity}</td>
+        <td>${r.unit}</td>
+      </tr>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
