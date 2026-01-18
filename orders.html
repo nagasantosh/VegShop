@@ -5,10 +5,12 @@
   <title>Delivery Schedule</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 8px; }
+    input[type="date"] { padding: 6px; font-size: 16px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
     th { background: #f4f4f4; }
-    select { font-size: 16px; padding: 6px; }
+    .message { margin-top: 15px; font-weight: bold; color: #c00; }
+    .mobile-block { margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -17,40 +19,33 @@
 
 <label>
   Select Delivery Date:
-  <select id="dateSelect"></select>
+  <input type="date" id="datePicker" />
 </label>
+
+<div id="noOrders" class="message" style="display:none;">
+  No orders for the selected date.
+</div>
 
 <h2>1. Total Quantity per Item</h2>
 <table>
   <thead>
-    <tr><th>Item</th><th>Total Qty</th><th>Unit</th></tr>
+    <tr><th>Item</th><th>Total Quantity</th><th>Unit</th></tr>
   </thead>
   <tbody id="itemSummary"></tbody>
 </table>
 
-<h2>2. Items by Mobile Number</h2>
-<table>
-  <thead>
-    <tr><th>Mobile No</th><th>Item</th><th>Qty</th><th>Unit</th></tr>
-  </thead>
-  <tbody id="mobileSummary"></tbody>
-</table>
+<h2>2. Orders Grouped by Mobile Number</h2>
+<div id="mobileGroups"></div>
 
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdjwBZPsWhEFvKDlbWK8-XK1lxE3jtpLNtc8kfv9OdkZHxIA-oIMohsQPhjwL-SmidxXC5xGJXsrCJ/pub?gid=135295189&single=true&output=csv";
+const CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdjwBZPsWhEFvKDlbWK8-XK1lxE3jtpLNtc8kfv9OdkZHxIA-oIMohsQPhjwL-SmidxXC5xGJXsrCJ/pub?gid=135295189&single=true&output=csv";
 
 let data = [];
 
 fetch(CSV_URL)
-  .then(res => res.text())
-  .then(text => {
-    data = csvToObjects(text);
-    populateDates();
-  })
-  .catch(err => {
-    console.error("CSV fetch failed:", err);
-    alert("Failed to load CSV — check the link or CORS settings.");
-  });
+  .then(r => r.text())
+  .then(text => data = csvToObjects(text));
 
 function csvToObjects(csv) {
   const lines = csv.trim().split(/\r?\n/);
@@ -63,33 +58,43 @@ function csvToObjects(csv) {
   });
 }
 
-function populateDates() {
-  const dateSelect = document.getElementById("dateSelect");
-  const dates = [...new Set(data.map(r => r.deliveryDate).filter(d => d))];
-  
-  dateSelect.innerHTML = "";
-  dates.forEach(d => {
-    const opt = document.createElement("option");
-    opt.value = d;
-    opt.textContent = d;
-    dateSelect.appendChild(opt);
-  });
+document.getElementById("datePicker").addEventListener("change", e => {
+  const selectedDate = e.target.value;
+  renderForDate(selectedDate);
+});
 
-  dateSelect.onchange = () => render(dateSelect.value);
+function renderForDate(date) {
+  const rows = data.filter(r => normalizeDate(r.deliveryDate) === date);
 
-  if (dates.length > 0) render(dates[0]);
+  const noOrders = document.getElementById("noOrders");
+  if (rows.length === 0) {
+    noOrders.style.display = "block";
+    document.getElementById("itemSummary").innerHTML = "";
+    document.getElementById("mobileGroups").innerHTML = "";
+    return;
+  } else {
+    noOrders.style.display = "none";
+  }
+
+  renderItemTotals(rows);
+  renderGroupedByMobile(rows);
 }
 
-function render(date) {
-  const filtered = data.filter(r => r.deliveryDate === date);
-  renderItemTotals(filtered);
-  renderByMobile(filtered);
+function normalizeDate(dateStr) {
+  // Handles formats like DD/MM/YYYY or YYYY-MM-DD
+  if (dateStr.includes("/")) {
+    const [d, m, y] = dateStr.split("/");
+    return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
+  }
+  return dateStr;
 }
 
 function renderItemTotals(rows) {
   const map = {};
   rows.forEach(r => {
-    if (!map[r.item]) map[r.item] = { qty: 0, unit: r.unit };
+    if (!map[r.item]) {
+      map[r.item] = { qty: 0, unit: r.unit };
+    }
     map[r.item].qty += Number(r.quantity || 0);
   });
 
@@ -106,18 +111,37 @@ function renderItemTotals(rows) {
   });
 }
 
-function renderByMobile(rows) {
-  const tbody = document.getElementById("mobileSummary");
-  tbody.innerHTML = "";
+function renderGroupedByMobile(rows) {
+  const groups = {};
   rows.forEach(r => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${r.mobileNumber}</td>
-        <td>${r.item}</td>
-        <td>${r.quantity}</td>
-        <td>${r.unit}</td>
-      </tr>
+    if (!groups[r.mobileNumber]) groups[r.mobileNumber] = [];
+    groups[r.mobileNumber].push(r);
+  });
+
+  const container = document.getElementById("mobileGroups");
+  container.innerHTML = "";
+
+  Object.entries(groups).forEach(([mobile, items]) => {
+    const div = document.createElement("div");
+    div.className = "mobile-block";
+    div.innerHTML = `
+      <h3>Mobile: ${mobile}</h3>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Quantity</th><th>Unit</th></tr>
+        </thead>
+        <tbody>
+          ${items.map(i => `
+            <tr>
+              <td>${i.item}</td>
+              <td>${i.quantity}</td>
+              <td>${i.unit}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
     `;
+    container.appendChild(div);
   });
 }
 </script>
