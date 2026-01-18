@@ -637,6 +637,15 @@
       No orders for the selected date.
     </div>
 
+    <!-- 1️⃣ ADD THIS HTML just ABOVE the item summary grid -->
+<div id="dayTotalCard" class="card hidden" style="margin-bottom:1.5rem">
+  <div class="card-header">
+    <div class="card-title">Total Order Value</div>
+    <div class="cart-total" id="dayTotalValue">₹0</div>
+  </div>
+</div>
+
+
     <!-- ITEM TOTALS -->
     <h2 class="summary-title">Item Summary</h2>
     <div id="itemTotals" class="items-grid"></div>
@@ -697,6 +706,7 @@ function renderForDate(date) {
 
   document.getElementById("itemTotals").innerHTML = "";
   document.getElementById("mobileGroups").innerHTML = "";
+  document.getElementById("dayTotalCard").classList.add("hidden");
 
   if (rows.length === 0) {
     document.getElementById("emptyState").classList.remove("hidden");
@@ -708,6 +718,7 @@ function renderForDate(date) {
   renderByMobile(rows);
 }
 
+
 function getIcon(itemName) {
   const key = itemName.toLowerCase();
   return ITEM_ICONS[key] || ITEM_ICONS.default;
@@ -715,6 +726,7 @@ function getIcon(itemName) {
 
 function renderItemTotals(rows) {
   const map = {};
+  let dayTotal = 0;
 
   rows.forEach(r => {
     if (!map[r.item]) {
@@ -722,7 +734,13 @@ function renderItemTotals(rows) {
     }
     map[r.item].qty += Number(r.quantity || 0);
     map[r.item].price += Number(r.total || 0);
+    dayTotal += Number(r.total || 0);
   });
+
+  // show total order value
+  document.getElementById("dayTotalValue").innerText =
+    `₹${dayTotal.toFixed(2)}`;
+  document.getElementById("dayTotalCard").classList.remove("hidden");
 
   const container = document.getElementById("itemTotals");
 
@@ -741,6 +759,7 @@ function renderItemTotals(rows) {
     `;
   });
 }
+
 
 function renderByMobile(rows) {
   const mobileMap = {};
