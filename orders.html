@@ -3,14 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <title>Delivery Schedule</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input[type="date"] { padding: 6px; font-size: 16px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
-    th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
-    th { background: #f4f4f4; }
-    .message { margin-top: 15px; font-weight: bold; color: #c00; }
-    .mobile-block { margin-top: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h1, h2, h3 {
+      margin-top: 24px;
+    }
+
+    input[type="date"] {
+      padding: 8px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 250px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    th {
+      background: #f4f4f4;
+    }
+
+    .message {
+      margin-top: 16px;
+      font-weight: bold;
+      color: #c00;
+    }
+
+    .mobile-block {
+      margin-top: 24px;
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 10px;
+      }
+
+      td {
+        border: none;
+        padding: 6px 0;
+      }
+
+      td::before {
+        font-weight: bold;
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
@@ -26,7 +90,7 @@
   No orders for the selected date.
 </div>
 
-<h2>1. Total Quantity per Item</h2>
+<h2>Total Quantity per Item</h2>
 <table>
   <thead>
     <tr><th>Item</th><th>Total Quantity</th><th>Unit</th></tr>
@@ -34,7 +98,7 @@
   <tbody id="itemSummary"></tbody>
 </table>
 
-<h2>2. Orders Grouped by Mobile Number</h2>
+<h2>Orders Grouped by Mobile Number</h2>
 <div id="mobileGroups"></div>
 
 <script>
@@ -59,29 +123,11 @@ function csvToObjects(csv) {
 }
 
 document.getElementById("datePicker").addEventListener("change", e => {
-  const selectedDate = e.target.value;
-  renderForDate(selectedDate);
+  renderForDate(e.target.value);
 });
 
-function renderForDate(date) {
-  const rows = data.filter(r => normalizeDate(r.deliveryDate) === date);
-
-  const noOrders = document.getElementById("noOrders");
-  if (rows.length === 0) {
-    noOrders.style.display = "block";
-    document.getElementById("itemSummary").innerHTML = "";
-    document.getElementById("mobileGroups").innerHTML = "";
-    return;
-  } else {
-    noOrders.style.display = "none";
-  }
-
-  renderItemTotals(rows);
-  renderGroupedByMobile(rows);
-}
-
 function normalizeDate(dateStr) {
-  // Handles formats like DD/MM/YYYY or YYYY-MM-DD
+  if (!dateStr) return "";
   if (dateStr.includes("/")) {
     const [d, m, y] = dateStr.split("/");
     return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
@@ -89,12 +135,25 @@ function normalizeDate(dateStr) {
   return dateStr;
 }
 
+function renderForDate(date) {
+  const rows = data.filter(r => normalizeDate(r.deliveryDate) === date);
+
+  if (rows.length === 0) {
+    document.getElementById("noOrders").style.display = "block";
+    document.getElementById("itemSummary").innerHTML = "";
+    document.getElementById("mobileGroups").innerHTML = "";
+    return;
+  }
+
+  document.getElementById("noOrders").style.display = "none";
+  renderItemTotals(rows);
+  renderGroupedByMobile(rows);
+}
+
 function renderItemTotals(rows) {
   const map = {};
   rows.forEach(r => {
-    if (!map[r.item]) {
-      map[r.item] = { qty: 0, unit: r.unit };
-    }
+    if (!map[r.item]) map[r.item] = { qty: 0, unit: r.unit };
     map[r.item].qty += Number(r.quantity || 0);
   });
 
@@ -112,35 +171,42 @@ function renderItemTotals(rows) {
 }
 
 function renderGroupedByMobile(rows) {
-  const groups = {};
+  const mobileMap = {};
+
   rows.forEach(r => {
-    if (!groups[r.mobileNumber]) groups[r.mobileNumber] = [];
-    groups[r.mobileNumber].push(r);
+    const mobile = r.mobileNumber;
+    if (!mobileMap[mobile]) mobileMap[mobile] = {};
+    if (!mobileMap[mobile][r.item]) {
+      mobileMap[mobile][r.item] = { qty: 0, unit: r.unit };
+    }
+    mobileMap[mobile][r.item].qty += Number(r.quantity || 0);
   });
 
   const container = document.getElementById("mobileGroups");
   container.innerHTML = "";
 
-  Object.entries(groups).forEach(([mobile, items]) => {
+  Object.entries(mobileMap).forEach(([mobile, items]) => {
     const div = document.createElement("div");
     div.className = "mobile-block";
+
     div.innerHTML = `
       <h3>Mobile: ${mobile}</h3>
       <table>
         <thead>
-          <tr><th>Item</th><th>Quantity</th><th>Unit</th></tr>
+          <tr><th>Item</th><th>Total Quantity</th><th>Unit</th></tr>
         </thead>
         <tbody>
-          ${items.map(i => `
+          ${Object.entries(items).map(([item, info]) => `
             <tr>
-              <td>${i.item}</td>
-              <td>${i.quantity}</td>
-              <td>${i.unit}</td>
+              <td>${item}</td>
+              <td>${info.qty}</td>
+              <td>${info.unit}</td>
             </tr>
           `).join("")}
         </tbody>
       </table>
     `;
+
     container.appendChild(div);
   });
 }
